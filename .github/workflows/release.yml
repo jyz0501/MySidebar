@@ -33,21 +33,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode keystore (optional, for real signed release)
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
           KP: ${{ secrets.KEYSTORE_PASSWORD }}
           KA: ${{ secrets.KEY_ALIAS }}
           KPP: ${{ secrets.KEY_PASSWORD }}
         run: |
-          mkdir -p keystore
-          echo "$KEYSTORE_B64" | base64 -d > keystore/release.jks
-          {
-            echo "STORE_FILE=keystore/release.jks"
-            echo "STORE_PASSWORD=$KP"
-            echo "KEY_ALIAS=$KA"
-            echo "KEY_PASSWORD=$KPP"
-          } > keystore.properties
+          if [ -n "$KEYSTORE_B64" ]; then
+            mkdir -p keystore
+            echo "$KEYSTORE_B64" | base64 -d > keystore/release.jks
+            {
+              echo "STORE_FILE=keystore/release.jks"
+              echo "STORE_PASSWORD=$KP"
+              echo "KEY_ALIAS=$KA"
+              echo "KEY_PASSWORD=$KPP"
+            } > keystore.properties
+          fi
 
       - name: Read version & signing label
         id: meta
