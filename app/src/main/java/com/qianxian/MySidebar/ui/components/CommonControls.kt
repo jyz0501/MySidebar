@@ -24,8 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -331,7 +331,7 @@ fun SettingNavItem(
             Text(subtitle, color = TextSecondary, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
         }
         Icon(
-            Icons.Default.KeyboardArrowRight,
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
             tint = TextSecondary,
             modifier = Modifier.size(16.dp)
@@ -380,7 +380,7 @@ fun AppHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
-            IconActionButton(Icons.Default.ArrowBack, TextPrimary, "返回", onBack, 32.dp)
+            IconActionButton(Icons.AutoMirrored.Filled.ArrowBack, TextPrimary, "返回", onBack, 32.dp)
             Spacer(Modifier.width(8.dp))
         }
         Column(Modifier.weight(1f)) {

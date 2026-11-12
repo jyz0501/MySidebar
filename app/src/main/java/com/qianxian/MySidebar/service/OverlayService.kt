@@ -91,9 +91,9 @@ class OverlayService : Service() {
         }
         scope.launch {
             // 设置界面进出前台时同步手势条的显示与隐藏。
-            ServiceBridge.hostInForeground.collect { foreground ->
-                val handle = handleView ?: return@collect
-                applyHandleVisibility(handle, AppContainer.settings.current())
+            ServiceBridge.hostInForeground.collect { _ ->
+                val hv = handleView ?: return@collect
+                applyHandleVisibility(hv, AppContainer.settings.current())
             }
         }
         scope.launch {
