@@ -3,6 +3,7 @@ package com.qianxian.MySidebar.data
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -14,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 
-data class AppInfo(val packageName: String, val label: String)
+data class AppInfo(val packageName: String, val label: String, val isSystem: Boolean = false)
 
 /** 已安装应用查询、应用图标内存缓存与启动逻辑。 */
 class AppRepository(private val context: Context) {
@@ -23,20 +24,31 @@ class AppRepository(private val context: Context) {
     private val iconCache = ConcurrentHashMap<String, ImageBitmap>()
 
     suspend fun loadLaunchableApps(): List<AppInfo> = withContext(Dispatchers.IO) {
+        val pm = packageManager
         val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val resolved = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        resolved.mapNotNull { info ->
-            val pkg = info.activityInfo?.packageName ?: return@mapNotNull null
-            if (pkg == context.packageName) return@mapNotNull null
-            val label = try {
-                info.loadLabel(packageManager).toString()
-            } catch (t: Throwable) {
-                pkg
+        // 遍历全部已安装应用，再逐包查其是否含 LAUNCHER 入口。
+        // 关键：对每个包 intent.setPackage(pkg) 后查询，Android 视其为“显式指定包名”，
+        // 不再受包可见性（Package Visibility）限制，能完整列出设备上的可启动应用，
+        // 避免 queryIntentActivities 直接查询时被过滤导致数量不全、搜索不到。
+        pm.getInstalledApplications(PackageManager.MATCH_ALL)
+            .filter { appInfo ->
+                if (appInfo.packageName == context.packageName) return@filter false
+                intent.setPackage(appInfo.packageName)
+                pm.queryIntentActivities(intent, 0).isNotEmpty()
             }
-            AppInfo(pkg, label)
-        }
-            .distinctBy { it.packageName }
-            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
+            .map { appInfo ->
+                val label = try {
+                    pm.getApplicationLabel(appInfo).toString()
+                } catch (t: Throwable) {
+                    appInfo.packageName
+                }
+                val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                AppInfo(appInfo.packageName, label, isSystem)
+            }
+            .sortedWith(
+                compareBy<AppInfo> { it.isSystem }
+                    .thenBy(String.CASE_INSENSITIVE_ORDER) { it.label }
+            )
     }
 
     suspend fun iconFor(packageName: String): ImageBitmap? = withContext(Dispatchers.IO) {

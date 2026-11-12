@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -136,50 +137,39 @@ fun AppPickerDialog(
                             modifier = Modifier.align(Alignment.Center)
                         )
                     } else {
+                        val userApps = filtered.filter { !it.isSystem }
+                        val systemApps = filtered.filter { it.isSystem }
+                        val showDivider = userApps.isNotEmpty() && systemApps.isNotEmpty()
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            items(filtered, key = { it.packageName }) { app ->
-                                val checked = app.packageName in selected
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(13.dp))
-                                        .background(
-                                            if (checked) Purple.copy(alpha = 0.18f)
-                                            else Color.White.copy(alpha = 0.03f)
-                                        )
-                                        .clickable {
-                                            selected = if (checked) selected - app.packageName
-                                            else selected + app.packageName
-                                        }
-                                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    AppIcon(app.packageName, size = 38.dp)
-                                    Spacer(Modifier.width(12.dp))
-                                    Column(Modifier.weight(1f)) {
-                                        Text(
-                                            app.label,
-                                            color = TextPrimary,
-                                            fontSize = 13.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                            items(userApps, key = { it.packageName }) { app ->
+                                AppRow(app, app.packageName in selected) { checked ->
+                                    selected = if (checked) selected + app.packageName
+                                    else selected - app.packageName
+                                }
+                            }
+                            if (showDivider) {
+                                item {
+                                    Column {
+                                        Box(
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                                .height(1.dp)
+                                                .background(Color.White.copy(alpha = 0.12f))
                                         )
                                         Text(
-                                            app.packageName,
+                                            "系统应用",
                                             color = TextSecondary,
-                                            fontSize = 10.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(start = 10.dp, top = 2.dp)
                                         )
                                     }
-                                    Checkbox(
-                                        checked = checked,
-                                        onCheckedChange = { isChecked ->
-                                            selected = if (isChecked) selected + app.packageName
-                                            else selected - app.packageName
-                                        },
-                                        colors = CheckboxDefaults.colors(checkedColor = Purple)
-                                    )
+                                }
+                            }
+                            items(systemApps, key = { it.packageName }) { app ->
+                                AppRow(app, app.packageName in selected) { checked ->
+                                    selected = if (checked) selected + app.packageName
+                                    else selected - app.packageName
                                 }
                             }
                         }
@@ -202,5 +192,42 @@ fun AppPickerDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AppRow(app: AppInfo, checked: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(13.dp))
+            .background(if (checked) Purple.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.03f))
+            .clickable { onToggle(!checked) }
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AppIcon(app.packageName, size = 38.dp)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                app.label,
+                color = TextPrimary,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                app.packageName,
+                color = TextSecondary,
+                fontSize = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onToggle,
+            colors = CheckboxDefaults.colors(checkedColor = Purple)
+        )
     }
 }
