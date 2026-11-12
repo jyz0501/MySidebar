@@ -85,38 +85,8 @@ class AppRepository(private val context: Context) {
         return result
     }
 
-    /** 出厂默认图标：固定锁定的应用优先，不足时用常见系统应用补足 6 个。 */
-    suspend fun defaultIconEntries(): List<IconEntry> {
-        val installed = loadLaunchableApps()
-        val byPackage = installed.associateBy { it.packageName }
-        val result = ArrayList<IconEntry>(6)
-        for (entry in pinnedEntries()) {
-            if (result.size >= 6) break
-            if (result.any { it.packageName == entry.packageName }) continue
-            result.add(entry)
-        }
-        val preferred = listOf(
-            "com.android.dialer", "com.google.android.dialer",
-            "com.google.android.apps.messaging", "com.android.mms",
-            "com.android.chrome", "org.mozilla.firefox",
-            "com.android.camera2", "com.google.android.GoogleCamera",
-            "com.google.android.apps.photos", "com.android.gallery3d",
-            "com.android.settings", "com.google.android.apps.maps",
-            "com.google.android.calendar", "com.android.calculator2"
-        )
-        for (pkg in preferred) {
-            if (result.size >= 6) break
-            val app = byPackage[pkg] ?: continue
-            if (result.any { it.packageName == pkg }) continue
-            result.add(IconEntry(pkg, app.label))
-        }
-        for (app in installed) {
-            if (result.size >= 6) break
-            if (result.any { it.packageName == app.packageName }) continue
-            result.add(IconEntry(app.packageName, app.label))
-        }
-        return result
-    }
+    /** 出厂默认图标：仅固定锁定的三款应用，未安装的自动跳过，不预置其他应用。 */
+    suspend fun defaultIconEntries(): List<IconEntry> = pinnedEntries()
 
     /**
      * 从悬浮窗启动应用。若遇到部分 ROM 的「后台弹出界面」限制，

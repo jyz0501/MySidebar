@@ -48,7 +48,6 @@ import com.qianxian.MySidebar.data.IconEntry
 import com.qianxian.MySidebar.data.SidebarSettings
 import com.qianxian.MySidebar.ui.components.AppIcon
 import com.qianxian.MySidebar.ui.components.AppPickerDialog
-import com.qianxian.MySidebar.ui.components.HintText
 import com.qianxian.MySidebar.ui.components.IconActionButton
 import com.qianxian.MySidebar.ui.components.PrimaryButton
 import com.qianxian.MySidebar.ui.components.SectionCard
@@ -103,8 +102,6 @@ fun IconsSection(
     } else {
         IconList(icons = settings.icons)
     }
-
-    HintText("两处交互一致：长按图标进入编辑并可直接拖拽排序，点右上角 X 角标删除；编辑态再点一下图标即可退出。侧边栏没有关闭按钮，点击侧边栏外的空白处即可收起。锁定的图标不显示 X，也不能被拖动；锁定状态在这里切换。最多支持 40 个快捷方式。")
 
     if (showPicker) {
         AppPickerDialog(

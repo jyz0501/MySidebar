@@ -6,20 +6,34 @@ import com.qianxian.MySidebar.data.SidebarSettings
 import com.qianxian.MySidebar.ui.components.HintText
 import com.qianxian.MySidebar.ui.components.SectionCard
 import com.qianxian.MySidebar.ui.components.SettingSlider
+import kotlin.math.abs
 import kotlin.math.roundToInt
+
+/** 三档灵敏度预设：滑块只有三个吸附节点。 */
+private val sensitivityLevels = listOf(12, 32, 55)
+private val sensitivityNames = listOf("灵敏", "均衡", "稳健")
+
+/** 当前配置值最近的档位下标。 */
+private fun levelIndexOf(dp: Int): Int =
+    sensitivityLevels.indices.minByOrNull { abs(sensitivityLevels[it] - dp) } ?: 1
 
 @Composable
 fun GestureSection(settings: SidebarSettings) {
+    val level = levelIndexOf(settings.edgeSensitivityDp)
     SectionCard(title = "边缘灵敏度", subtitle = "触发所需的横向滑动距离") {
         SettingSlider(
             label = "滑动触发距离",
-            value = settings.edgeSensitivityDp.toFloat(),
-            range = SidebarSettings.SENSITIVITY_RANGE,
-            display = "${settings.edgeSensitivityDp} dp",
+            value = level.toFloat(),
+            range = 0f..2f,
+            steps = 2,
+            display = "${sensitivityNames[level]} · ${settings.edgeSensitivityDp} dp",
             onValueChange = {
-                AppContainer.settings.update { s -> s.copy(edgeSensitivityDp = it.roundToInt()) }
+                val idx = it.roundToInt().coerceIn(0, sensitivityLevels.lastIndex)
+                AppContainer.settings.update { s ->
+                    s.copy(edgeSensitivityDp = sensitivityLevels[idx])
+                }
             },
-            hint = sensitivityHint(settings.edgeSensitivityDp)
+            hint = sensitivityHint(sensitivityLevels[level])
         )
     }
 

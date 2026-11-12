@@ -52,12 +52,21 @@ android {
     }
 
     signingConfigs {
+        // debug 与 release 均启用 APK Signature Scheme v1/v2/v3，兼顾旧系统兼容与现代安全。
+        getByName("debug") {
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
         if (keystoreProps.isNotEmpty()) {
             create("release") {
                 storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
                 storePassword = keystoreProps.getProperty("storePassword")
                 keyAlias = keystoreProps.getProperty("keyAlias")
                 keyPassword = keystoreProps.getProperty("keyPassword")
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
             }
         }
     }

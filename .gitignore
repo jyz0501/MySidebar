@@ -11,3 +11,5 @@
 # 签名材料与本机配置，不要提交
 /keystore/
 keystore.properties
+# 构建脚本产出的命名 APK
+/*.apk
