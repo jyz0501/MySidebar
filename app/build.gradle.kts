@@ -39,11 +39,11 @@ val keystoreProps = Properties().apply {
 }
 
 android {
-    namespace = "com.mysidebar"
+    namespace = "com.qianxian.MySidebar"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mysidebar"
+        applicationId = "com.qianxian.MySidebar"
         minSdk = 26
         targetSdk = 34
         versionCode = appVersionCode
