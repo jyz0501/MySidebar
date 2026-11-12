@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -105,7 +106,9 @@ fun SettingSlider(
     display: String,
     onValueChange: (Float) -> Unit,
     hint: String? = null,
-    steps: Int = 0
+    steps: Int = 0,
+    /** 轨道上显性标记的节点数（>1 时绘制，不改变滑块的连续取值行为）。 */
+    tickCount: Int = 0
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp)) {
         Row(
@@ -138,6 +141,25 @@ fun SettingSlider(
                 ),
                 modifier = Modifier.fillMaxWidth().height(26.dp)
             )
+        }
+        if (tickCount > 1) {
+            // 在轨道上叠加显性节点标记：仅视觉提示，不影响连续取值。
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+                    .offset(y = (-15).dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                repeat(tickCount) {
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .clip(CircleShape)
+                            .background(TextSecondary.copy(alpha = 0.55f))
+                    )
+                }
+            }
         }
         if (hint != null) {
             Text(hint, color = TextSecondary, fontSize = 10.sp, lineHeight = 13.sp)
