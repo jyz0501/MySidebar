@@ -7,8 +7,8 @@
 - **边缘手势唤出**：屏幕侧边一条常驻手势条，轻点或向内滑动即展开侧边栏；点击空白处收起。
 - **六向停靠**：左/右 × 上/中/下共六种停靠位置，侧边栏与手势条同步移动。
 - **外观自定义**：宽度、高度、整体透明度、划出动画速度均可调，在真实悬浮层上实时预览。
-- **手势可调**：触发灵敏度、触发区高度独立调节。
-- **应用管理**：添加 / 删除 / 锁定 / 排序应用快捷方式；锁定项不可删除或拖动（默认锁定若干系统/内置应用，未安装的自动跳过）。
+- **手势可调**：触发灵敏度（四档参考节点标记、连续可调、不强制吸附）、触发区高度独立调节。
+- **应用管理**：添加 / 删除 / 锁定 / 排序应用快捷方式；出厂默认仅锁定三款内置应用（未安装的自动跳过），可自行添加常用应用。
 - **开机自启动**：通过 `BOOT_COMPLETED` 广播恢复悬浮窗服务，并提供跳转系统自启动设置的入口。
 - **前台/后台切换**：总开关一键启停；可暂停唤出（保留服务，通知栏提供「收起」操作）。
 - **滑出音效**：展开时播放一段极短的卡通式「冒出」音（程序合成，无音频资源）。
@@ -21,16 +21,29 @@
 - `minSdk = 26`，`targetSdk = 34`，`compileSdk = 34`
 - Release 构建开启 R8 代码压缩与资源压缩（APK 约 1.1 MB）
 
-## 构建
+## 构建与交付
 
-```bash
-./gradlew assembleRelease          # 生成签名 release 包
-./gradlew bumpVersion              # 递增版本号（major*1000 + minor*100 + patch）
+### 本地构建脚本（推荐）
+仓库根目录的 `build_apk.bat`（Windows）一键产出按规范命名的 APK：
+
+```bat
+build_apk.bat
 ```
 
-### 签名
+产出文件名形如：`轻边栏_v1.0.3_202611121933_v2v3调试签名.apk`
+- **版本**取自 `version.properties`（`major.minor.patch`，各 0–9）
+- **时间**为构建时刻 `yyyyMMddHHmm`
+- **签名情况**：`v2v3已签名`（配置了 keystore）或 `v2v3调试签名`（无 keystore，回退 debug）
 
-仓库不包含签名文件。复制 `keystore.properties.example` 为 `keystore.properties` 并填写：
+### Gradle / CI
+```bash
+./gradlew assembleRelease     # 生成 release 包
+./gradlew bumpVersion         # 递增版本号（versionCode = major*1000 + minor*100 + patch）
+```
+GitHub Actions（`.github/workflows/build.yml`）在 push/PR 时于 Ubuntu + JDK17 自动构建并上传 APK 产物；无 keystore 时回退 debug 签名。
+
+### 签名
+启用 APK Signature Scheme **v1 / v2 / v3**。仓库不包含签名文件：复制 `keystore.properties.example` 为 `keystore.properties` 并填写：
 
 ```
 STORE_FILE=keystore/mysidebar.jks
@@ -39,7 +52,7 @@ KEY_ALIAS=mysidebar
 KEY_PASSWORD=***
 ```
 
-若缺少该文件，release 构建会回退到 debug 签名，便于覆盖安装保留配置数据。
+若缺少该文件，release 构建回退到 debug 签名，便于覆盖安装保留配置数据。
 
 ## 权限说明
 

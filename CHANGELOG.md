@@ -2,6 +2,22 @@
 
 本项目以「轻量克制」为原则，下列为当前开发阶段的迭代记录。
 
+## 1.0.2 / 1.0.3 开发迭代
+
+### 工程与交付
+- 包名由 `com.mysidebar` 迁移至 `com.qianxian.MySidebar`：源码目录重命名并对全部 import、manifest、Activity 启动串全局替换；构建通过（此前被增量编译掩盖的 `ViewTree*` RestrictTo 引用问题，同步以反射方案修复，并在 `proguard-rules.pro` 保留相关类）。
+- 新增 GitHub Actions 构建工作流（Ubuntu + JDK17，含 Gradle 缓存），push/PR 自动构建 release 并上传 APK；并修复了 `gradlew` 缺可执行权限导致 CI 失败（exit 126）的问题。
+- 启用 APK 签名方案 **v1 / v2 / v3**（`app/build.gradle.kts` 的 signingConfigs 显式开启）。
+- 新增本地构建脚本 `build_apk.bat`：一键产出规范命名 APK `轻边栏_v版本_时间_签名情况.apk`（如 `轻边栏_v1.0.3_202611121933_v2v3调试签名.apk`），产物已加入 `.gitignore` 忽略。
+
+### 设置交互
+- 边缘灵敏度滑块由三档吸附改为 **四个参考节点标记 + 连续取值**（节点仅作视觉提示，不强制吸附）；档位命名为 极灵敏 / 灵敏 / 均衡 / 稳健。
+- 图标管理卡片删除下方交互说明文字，界面更干净。
+- 出厂默认图标集仅保留三款固定锁定应用，不再预置其它系统应用；「恢复默认」即恢复此三款。
+
+### 版本
+- 版本号由 1.0.1 提升至 1.0.3（`version.properties` 单一真源）。
+
 ## 1.0.1 开发迭代
 
 ### 悬浮窗与交互
