@@ -1,0 +1,3 @@
+-keepattributes *Annotation*, InnerClasses
+-dontwarn kotlinx.**
+-keepclassmembers class com.mysidebar.data.** { *; }

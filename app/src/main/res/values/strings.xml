@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">轻边栏</string>
+    <string name="notification_channel">侧边栏服务</string>
+    <string name="notification_title">轻边栏正在运行</string>
+    <string name="notification_text">从屏幕边缘滑动即可唤出</string>
+    <string name="notification_paused">轻边栏已暂停</string>
+    <string name="action_hide">收起</string>
+</resources>
