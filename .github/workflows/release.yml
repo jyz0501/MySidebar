@@ -43,10 +43,10 @@ jobs:
             mkdir -p keystore
             echo "$KEYSTORE_B64" | base64 -d > keystore/release.jks
             {
-              echo "STORE_FILE=keystore/release.jks"
-              echo "STORE_PASSWORD=$KP"
-              echo "KEY_ALIAS=$KA"
-              echo "KEY_PASSWORD=$KPP"
+              echo "storeFile=keystore/release.jks"
+              echo "storePassword=$KP"
+              echo "keyAlias=$KA"
+              echo "keyPassword=$KPP"
             } > keystore.properties
           fi
 
