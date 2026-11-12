@@ -105,6 +105,7 @@ fun IconsSection(
 
     if (showPicker) {
         AppPickerDialog(
+            existingPackageNames = settings.icons.map { it.packageName }.toSet(),
             onDismiss = { showPicker = false },
             onConfirm = { apps ->
                 AppContainer.settings.update { current ->

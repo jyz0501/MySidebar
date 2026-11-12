@@ -81,7 +81,8 @@ fun AppIcon(packageName: String, modifier: Modifier = Modifier, size: Dp = 40.dp
 @Composable
 fun AppPickerDialog(
     onDismiss: () -> Unit,
-    onConfirm: (List<AppInfo>) -> Unit
+    onConfirm: (List<AppInfo>) -> Unit,
+    existingPackageNames: Set<String> = emptySet()
 ) {
     val state by produceState(initialValue = PickerState()) {
         value = PickerState(loading = false, apps = AppContainer.apps.loadLaunchableApps())
@@ -89,12 +90,14 @@ fun AppPickerDialog(
     var query by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf(setOf<String>()) }
 
-    val filtered = remember(state.apps, query) {
-        if (query.isBlank()) state.apps
-        else state.apps.filter {
-            it.label.contains(query, ignoreCase = true) ||
-                it.packageName.contains(query, ignoreCase = true)
-        }
+    val filtered = remember(state.apps, query, existingPackageNames) {
+        state.apps
+            .filter { it.packageName !in existingPackageNames }
+            .filter {
+                query.isBlank() ||
+                    it.label.contains(query, ignoreCase = true) ||
+                    it.packageName.contains(query, ignoreCase = true)
+            }
     }
 
     Dialog(
@@ -112,7 +115,7 @@ fun AppPickerDialog(
             Column(modifier = Modifier.padding(18.dp)) {
                 Text("添加应用", color = TextPrimary, fontSize = 20.sp)
                 Text(
-                    "选择要放进侧边栏的应用，可多选",
+                    "选择要放进侧边栏的应用，可多选；已添加的应用不显示",
                     color = TextSecondary,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
